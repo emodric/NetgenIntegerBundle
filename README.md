@@ -1,1 +1,1 @@
-NetgenInteger2Bundle
+NetgenIntegerBundle
