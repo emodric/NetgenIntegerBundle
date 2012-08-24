@@ -1,0 +1,16 @@
+parameters:
+    ezpublish.fieldType.nginteger.class: Netgen\IntegerBundle\Core\FieldType\NgInteger\Type
+    ezpublish.fieldType.nginteger.externalStorage.class: Netgen\IntegerBundle\Core\FieldType\NgInteger\NgIntegerStorage
+
+services:
+    ezpublish.fieldType.nginteger:
+        class: %ezpublish.fieldType.nginteger.class%
+        parent: ezpublish.fieldType
+        tags:
+            - {name: ezpublish.fieldType, alias: nginteger}
+
+    ezpublish.fieldType.nginteger.externalStorage:
+        class: %ezpublish.fieldType.nginteger.externalStorage.class%
+        arguments: [[]]
+        tags:
+            - {name: ezpublish.fieldType.externalStorageHandler, alias: nginteger}

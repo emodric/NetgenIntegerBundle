@@ -1,0 +1,14 @@
+parameters:
+    ezpublish.fieldType.nginteger.converter.class: Netgen\IntegerBundle\Core\Persistence\Legacy\Content\FieldValue\Converter\NgInteger
+    ezpublish.fieldType.nginteger.storage_gateway.class: Netgen\IntegerBundle\Core\FieldType\NgInteger\NgIntegerStorage\Gateway\LegacyStorage
+
+services:
+    ezpublish.fieldType.nginteger.converter:
+        class: %ezpublish.fieldType.nginteger.converter.class%
+        tags:
+            - {name: ezpublish.storageEngine.legacy.converter, alias: nginteger, lazy: true, callback: '::create'}
+
+    ezpublish.fieldType.nginteger.storage_gateway:
+        class: %ezpublish.fieldType.nginteger.storage_gateway.class%
+        tags:
+            - {name: ezpublish.fieldType.externalStorageHandler.gateway, alias: nginteger, identifier: LegacyStorage}
