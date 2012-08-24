@@ -47,12 +47,13 @@ class NgIntegerStorage extends GatewayBasedStorage
      * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      * @param array $context
-     * @return null|true
+     * @return null|bool
      */
     public function storeFieldData( VersionInfo $versionInfo, Field $field, array $context )
     {
+        /** @var \Netgen\IntegerBundle\Core\FieldType\NgInteger\NgIntegerStorage\Gateway $gateway */
         $gateway = $this->getGateway( $context );
-        $gateway->storeFieldData( $field );
+        $gateway->storeFieldData( $versionInfo, $field );
     }
 
     /**
@@ -67,8 +68,9 @@ class NgIntegerStorage extends GatewayBasedStorage
      */
     public function getFieldData( VersionInfo $versionInfo, Field $field, array $context )
     {
+        /** @var \Netgen\IntegerBundle\Core\FieldType\NgInteger\NgIntegerStorage\Gateway $gateway */
         $gateway = $this->getGateway( $context );
-        $gateway->getFieldData( $field );
+        $gateway->getFieldData( $versionInfo, $field );
     }
 
     /**
@@ -82,6 +84,9 @@ class NgIntegerStorage extends GatewayBasedStorage
      */
     public function deleteFieldData( VersionInfo $versionInfo, array $fieldIds, array $context )
     {
+        /** @var \Netgen\IntegerBundle\Core\FieldType\NgInteger\NgIntegerStorage\Gateway $gateway */
+        $gateway = $this->getGateway( $context );
+        $gateway->deleteFieldData( $versionInfo, $fieldIds );
     }
 
     /**

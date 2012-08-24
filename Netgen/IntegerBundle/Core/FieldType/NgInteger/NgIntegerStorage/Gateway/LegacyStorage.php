@@ -66,26 +66,28 @@ class LegacyStorage extends Gateway
     /**
      * Stores the numbers in the database based on the given field data
      *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      */
-    public function storeFieldData( Field $field )
+    public function storeFieldData( VersionInfo $versionInfo, Field $field )
     {
-        if ( $this->hasFieldData( $field ) )
+        if ( $this->hasFieldData( $versionInfo, $field ) )
         {
-            $this->updateFieldData( $field );
+            $this->updateFieldData( $versionInfo, $field );
         }
         else
         {
-            $this->insertFieldData( $field );
+            $this->insertFieldData( $versionInfo, $field );
         }
     }
 
     /**
      * Gets the numbers stored in the field
      *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      */
-    public function getFieldData( Field $field )
+    public function getFieldData( VersionInfo $versionInfo, Field $field )
     {
         $dbHandler = $this->getConnection();
 
@@ -98,12 +100,12 @@ class LegacyStorage extends Gateway
         )->where(
             $query->expr->lAnd(
                 $query->expr->eq(
-                    $this->dbHandler->quoteColumn( "contentobject_attribute_id" ),
+                    $dbHandler->quoteColumn( "contentobject_attribute_id" ),
                     $query->bindValue( $field->id, null, \PDO::PARAM_INT )
                 ),
                 $query->expr->eq(
-                    $this->dbHandler->quoteColumn( "version" ),
-                    $query->bindValue( $field->versionNo, null, \PDO::PARAM_INT )
+                    $dbHandler->quoteColumn( "version" ),
+                    $query->bindValue( $versionInfo->versionNo, null, \PDO::PARAM_INT )
                 )
             )
         );
@@ -122,13 +124,47 @@ class LegacyStorage extends Gateway
     }
 
     /**
+     * Deletes field data for all $fieldIds in the version identified by
+     * $versionInfo.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
+     * @param array $fieldIds
+     */
+    public function deleteFieldData( VersionInfo $versionInfo, array $fieldIds )
+    {
+        if ( empty( $fieldIds ) )
+            return;
+
+        $dbHandler = $this->getConnection();
+
+        $query = $dbHandler->createDeleteQuery();
+        $query->deleteFrom(
+            $dbHandler->quoteTable( self::NGINTEGER_TABLE )
+        )->where(
+            $query->expr->lAnd(
+                $query->expr->in(
+                    $dbHandler->quoteColumn( "contentobject_attribute_id" ),
+                    $fieldIds
+                ),
+                $query->expr->eq(
+                    $dbHandler->quoteColumn( "version" ),
+                    $query->bindValue( $versionInfo->versionNo, null, \PDO::PARAM_INT )
+                )
+            )
+        );
+
+        $query->prepare()->execute();
+    }
+
+    /**
      * Returns if the database table has an entry for $field
      *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      *
      * @return bool
      */
-    private function hasFieldData( Field $field )
+    private function hasFieldData( VersionInfo $versionInfo, Field $field )
     {
         $dbHandler = $this->getConnection();
 
@@ -140,12 +176,12 @@ class LegacyStorage extends Gateway
         )->where(
             $query->expr->lAnd(
                 $query->expr->eq(
-                    $this->dbHandler->quoteColumn( "contentobject_attribute_id" ),
+                    $dbHandler->quoteColumn( "contentobject_attribute_id" ),
                     $query->bindValue( $field->id, null, \PDO::PARAM_INT )
                 ),
                 $query->expr->eq(
-                    $this->dbHandler->quoteColumn( "version" ),
-                    $query->bindValue( $field->versionNo, null, \PDO::PARAM_INT )
+                    $dbHandler->quoteColumn( "version" ),
+                    $query->bindValue( $versionInfo->versionNo, null, \PDO::PARAM_INT )
                 )
             )
         );
@@ -161,9 +197,10 @@ class LegacyStorage extends Gateway
     /**
      * Inserts $field data to the database table
      *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      */
-    private function insertFieldData( Field $field )
+    private function insertFieldData( VersionInfo $versionInfo, Field $field )
     {
         $dbHandler = $this->getConnection();
 
@@ -175,7 +212,7 @@ class LegacyStorage extends Gateway
             $query->bindValue( $field->id, null, \PDO::PARAM_INT )
         )->set(
             $dbHandler->quoteColumn( "version" ),
-            $query->bindValue( $field->versionNo, null, \PDO::PARAM_INT )
+            $query->bindValue( $versionInfo->versionNo, null, \PDO::PARAM_INT )
         )->set(
             $dbHandler->quoteColumn( "first_number" ),
             $query->bindValue( $field->value->externalData["firstNumber"], null, \PDO::PARAM_INT )
@@ -190,9 +227,10 @@ class LegacyStorage extends Gateway
     /**
      * Updates $field data in the database table
      *
+     * @param \eZ\Publish\SPI\Persistence\Content\VersionInfo $versionInfo
      * @param \eZ\Publish\SPI\Persistence\Content\Field $field
      */
-    private function updateFieldData( Field $field )
+    private function updateFieldData( VersionInfo $versionInfo, Field $field )
     {
         $dbHandler = $this->getConnection();
 
@@ -208,12 +246,12 @@ class LegacyStorage extends Gateway
         )->where(
             $query->expr->lAnd(
                 $query->expr->eq(
-                    $this->dbHandler->quoteColumn( "contentobject_attribute_id" ),
+                    $dbHandler->quoteColumn( "contentobject_attribute_id" ),
                     $query->bindValue( $field->id, null, \PDO::PARAM_INT )
                 ),
                 $query->expr->eq(
-                    $this->dbHandler->quoteColumn( "version" ),
-                    $query->bindValue( $field->versionNo, null, \PDO::PARAM_INT )
+                    $dbHandler->quoteColumn( "version" ),
+                    $query->bindValue( $versionInfo->versionNo, null, \PDO::PARAM_INT )
                 )
             )
         );
