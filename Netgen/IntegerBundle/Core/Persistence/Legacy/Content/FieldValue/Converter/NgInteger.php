@@ -103,10 +103,10 @@ class NgInteger implements Converter
     {
         $fieldDef->fieldTypeConstraints->validators = array(
             "NgIntegerValueValidator" => array(
-                "firstNumberMin" => is_numeric( $storageDef->dataInt1 ) ? (int) $storageDef->dataInt1 : 0,
-                "firstNumberMax" => is_numeric( $storageDef->dataInt2 ) ? (int) $storageDef->dataInt2 : false,
-                "secondNumberMin" => is_numeric( $storageDef->dataInt3 ) ? (int) $storageDef->dataInt3 : 0,
-                "secondNumberMax" => is_numeric( $storageDef->dataInt4 ) ? (int) $storageDef->dataInt4 : false
+                "firstNumberMin" => isset( $storageDef->dataInt1 ) ? $storageDef->dataInt1 : 0,
+                "firstNumberMax" => isset( $storageDef->dataInt2 ) ? $storageDef->dataInt2 : false,
+                "secondNumberMin" => isset( $storageDef->dataInt3 ) ? $storageDef->dataInt3 : 0,
+                "secondNumberMax" => isset( $storageDef->dataInt4 ) ? $storageDef->dataInt4 : false
             )
         );
     }
